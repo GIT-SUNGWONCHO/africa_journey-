@@ -1,306 +1,119 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroMosaic from '../components/HeroMosaic.astro';
 import StoryGallery from '../components/StoryGallery.astro';
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import { summary, intro } from '../data/summary';
-import { itinerary, regionLabel, options } from '../data/itinerary';
-import { costs, costMeta, costTotal } from '../data/costs';
-import { heroPhotos } from '../data/gallery';
+import { featured, heroHook } from '../data/hero';
 import { reels } from '../data/stories';
-
-// src/assets/hero/ 안의 사진을 자동으로 읽어 슬라이드쇼로. (파일명 정렬순)
-const heroModules = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/hero/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}',
-  { eager: true }
-);
-const heroImages = Object.keys(heroModules).sort().map((k) => heroModules[k].default);
-const hasHeroImages = heroImages.length > 0;
-
-const tipDocs = await getCollection('tips');
-const tips = tipDocs.map((t) => t.data).sort((a, b) => a.order - b.order);
-
-const categoryLabel: Record<string, string> = {
-  safari: '사파리 예약', transport: '이동·택시', zanzibar: '잔지바르 액티비티',
-  haggle: '흥정', food: '음식', money: '환전·팁', prep: '유심·비자·준비', etc: '기타',
-};
-const categoryOrder = ['safari', 'transport', 'zanzibar', 'haggle', 'money', 'food', 'prep', 'etc'];
-const tipsByCat = categoryOrder
-  .map((cat) => ({ cat, items: tips.filter((t) => t.category === cat) }))
-  .filter((g) => g.items.length > 0);
+import { why, doCards, phases } from '../data/magazine';
 ---
 <BaseLayout>
   <span id="top"></span>
 
-  <!-- HERO : 메인 사진 슬라이드쇼 위에 TANZANIA -->
-  <section class="hero">
-    <div class="hero__slides" id="hero-slides">
-      {hasHeroImages
-        ? heroImages.map((img, i) => (
-            <div class={`hero__slide ${i === 0 ? 'is-active' : ''}`} data-i={i}>
-              <Image src={img} alt="" class="hero__img" widths={[768, 1280, 1920]} sizes="100vw" loading={i === 0 ? 'eager' : 'lazy'} />
-            </div>
-          ))
-        : heroPhotos.map((p, i) => (
-            <div class={`hero__slide hero__slide--${p.tone ?? 'savanna'} ${i === 0 ? 'is-active' : ''}`} data-i={i}></div>
-          ))}
-      <div class="hero__veil"></div>
-    </div>
-    <div class="hero__inner">
-      <h1 class="hero__mark">TANZANIA</h1>
-      <p class="hero__sub">세렝게티 · 잔지바르</p>
-    </div>
-    <a class="hero__scroll" href="#stories" aria-label="아래로">↓</a>
-  </section>
+  <!-- ① 히어로: 킬러 미디어 월 -->
+  <HeroMosaic tiles={featured} title={heroHook.title} line={heroHook.line} />
 
-  <!-- 스토리 : 주제별 서사 (제목 없이 바로) -->
+  <!-- ② 스토리: 부가 (탭해서 보기) -->
   <section id="stories" class="stories">
+    <p class="tag container">STORIES · 하나씩 눌러봐</p>
     <div class="bleed-rail">
       <StoryGallery reels={reels} />
     </div>
   </section>
 
-  <!-- 한눈에 -->
-  <section id="overview" class="section section--sand">
-    <div class="container">
-      <p class="tag">AT A GLANCE</p>
-      <div class="stats">
-        {summary.map((s) => (
-          <div class="stat-card">
-            <div class="stat-card__value">{s.value}</div>
-            <div class="stat-card__label">{s.label}</div>
-            {s.sub && <div class="stat-card__sub">{s.sub}</div>}
-          </div>
-        ))}
-      </div>
+  <!-- ③ 왜 탄자니아 -->
+  <section id="why" class="why">
+    <div class="container--narrow">
+      <p class="tag" style="color:var(--savanna)">{why.kicker}</p>
+      <h2 class="why__line">{why.line}</h2>
+      <p class="why__sub">{why.sub}</p>
     </div>
   </section>
 
-  <!-- 일정 -->
-  <section id="itinerary" class="section">
+  <!-- ④ 여기서 뭘 하나 -->
+  <section id="do" class="section">
     <div class="container">
-      <p class="tag">ITINERARY · 11박 13일</p>
-      <ol class="timeline">
-        {itinerary.map((d) => (
-          <li class={`tl tl--${d.region}`}>
-            <div class="tl__day">DAY {d.day} · {d.date}</div>
-            <div class="tl__body">
-              <span class={`badge badge--${d.region}`}>{regionLabel[d.region]}</span>
-              <h3 class="tl__title">{d.place}</h3>
-              {d.hotel && <p class="tl__hotel">🏨 {d.hotel}</p>}
-              <p class="tl__desc">{d.desc}</p>
+      <p class="tag">WHAT YOU CAN DO</p>
+      <div class="do-grid">
+        {doCards.map((c) => (
+          <article class={`do-card do-card--${c.tone}`}>
+            {c.img && <img class="do-card__img" src={c.img} alt={c.title} loading="lazy" />}
+            <div class="do-card__body">
+              <span class="do-card__emoji">{c.emoji}</span>
+              <h3>{c.title}</h3>
+              <p>{c.copy}</p>
             </div>
-          </li>
-        ))}
-      </ol>
-
-      <p class="tag tag--mt">OPTIONS</p>
-      <div class="options">
-        {options.map((o) => (
-          <div class="option-card">
-            <div class="option-card__days">{o.days}</div>
-            <h4>{o.name}</h4>
-            <p>{o.desc}</p>
-            <p class="option-card__best">👍 {o.best}</p>
-          </div>
+          </article>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- 견적 -->
-  <section id="cost" class="section section--sand">
-    <div class="container container--narrow">
-      <p class="tag">BUDGET</p>
-      <p class="tag-note">{costMeta.basis}</p>
-      <table class="cost-table">
-        <thead><tr><th>분류</th><th>항목</th><th class="num">금액</th></tr></thead>
-        <tbody>
-          {costs.map((c) => (
-            <tr>
-              <td class="cost-cat">{c.category}</td>
-              <td>{c.item}{c.note && <span class="cost-note">{c.note}</span>}</td>
-              <td class="num">{c.amount}</td>
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr><td colspan="2">{costTotal.label}</td><td class="num">{costTotal.amount}</td></tr>
-          <tr class="per-person"><td colspan="2">1인 환산</td><td class="num">{costTotal.perPerson}</td></tr>
-        </tfoot>
-      </table>
-    </div>
-  </section>
-
-  <!-- 꿀팁 -->
-  <section id="tips" class="section">
-    <div class="container">
-      <p class="tag">TIPS</p>
-      {tipsByCat.map((g) => (
-        <div class="tip-group">
-          <h3 class="sub-head">{categoryLabel[g.cat]}</h3>
-          <div class="tips">
-            {g.items.map((t) => (
-              <article class="tip-card">
-                <h4>{t.title}</h4>
-                <p class="tip-card__summary">{t.summary}</p>
-                <ul class="tip-card__meta">
-                  {t.price && <li>💰 {t.price}</li>}
-                  {t.location && <li>📍 {t.location}</li>}
-                  {t.contact && <li>📱 {t.contact}</li>}
-                </ul>
-              </article>
-            ))}
+  <!-- ⑤ 일정은 보통 이렇게 -->
+  <section id="plan" class="section section--sand">
+    <div class="container--narrow">
+      <p class="tag">보통 이런 흐름</p>
+      <div class="phases">
+        {phases.map((p) => (
+          <div class={`phase phase--${p.tone}`}>
+            <div class="phase__tag">{p.tag}</div>
+            <h3 class="phase__title">{p.title} <span>{p.days}</span></h3>
+            <p class="phase__desc">{p.desc}</p>
           </div>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- 준비 -->
-  <section id="prep" class="section section--sand">
-    <div class="container">
-      <p class="tag">BEFORE YOU GO</p>
-      <div class="two-col">
-        <div class="info-block">
-          <h3>날씨 &amp; 옷차림</h3>
-          <ul>
-            <li><b>건기(6~10월)</b>가 사파리 최적. 동물 잘 보이고 길도 좋아.</li>
-            <li>사파리는 <b>일교차 큼</b> — 새벽엔 경량패딩, 낮엔 반팔.</li>
-            <li>흙먼지 많아 <b>카키·베이지 톤</b> 긴팔·긴바지 추천.</li>
-            <li>잔지바르는 덥고 습함 — 수영복·린넨·샌들. 스톤타운에선 <b>어깨·무릎 가리기</b>.</li>
-            <li>선글라스·모자·선크림·벌레기피제 필수.</li>
-          </ul>
-        </div>
-        <div class="info-block">
-          <h3>문화 &amp; 매너</h3>
-          <ul>
-            <li>인사는 <b>"Jambo!"</b>, 고마움은 <b>"Asante"</b>.</li>
-            <li>잔지바르는 <b>이슬람권</b> — 노출 자제, 라마단 배려.</li>
-            <li>사람·아이 사진은 <b>먼저 양해</b>.</li>
-            <li>악수·전달은 오른손으로.</li>
-            <li>"<b>폴레폴레(천천히)</b>" 문화. 조급해 말기.</li>
-          </ul>
-        </div>
+        ))}
       </div>
+      <p class="plan__note">우리는 11박 13일로 다녀왔어요. 자세한 일정·견적은 추후 추가 예정.</p>
     </div>
   </section>
 
-  <!-- 커뮤니티 -->
+  <!-- ⑥ 마무리 -->
   <section class="section section--bush cta-final">
-    <div class="container container--narrow" style="text-align:center">
-      <h2 class="cta-title">너의 꿀팁도 더해줘</h2>
-      <p class="cta-lead">택시 번호, 협상가, 숙소 후기 — 같이 쌓아갈 공간 만드는 중.</p>
-      <p class="coming-soon">Coming soon</p>
+    <div class="container--narrow" style="text-align:center">
+      <h2 class="cta-title">가고 싶어졌다면</h2>
+      <p class="cta-lead">우리가 다녀온 길, 더 궁금하면 스토리부터 하나씩 눌러보세요.</p>
+      <a class="cta-btn" href="#stories">스토리 보러가기 ↑</a>
     </div>
   </section>
 
   <style>
-    .tag { font-family: var(--font-body); font-weight: 800; font-size: 0.78rem; letter-spacing: 0.16em; color: var(--savanna-d); margin: 0 0 1.5rem; }
-    .tag--mt { margin-top: 3rem; }
-    .tag-note { color: var(--muted); font-size: 0.85rem; margin: -1rem 0 1.2rem; }
-    .section--bush .tag { color: var(--savanna); }
+    .tag { font-family: var(--font-body); font-weight: 800; font-size: 0.78rem; letter-spacing: 0.16em; color: var(--savanna-d); margin: 0 0 1.2rem; }
+    .container--narrow { width: min(100% - 2.5rem, var(--maxw-narrow)); margin-inline: auto; }
 
-    /* HERO + 슬라이드쇼 */
-    .hero { position: relative; min-height: 100svh; display: grid; place-items: center; color: var(--on-dark); overflow: hidden; text-align: center; }
-    .hero__slides { position: absolute; inset: 0; }
-    .hero__slide {
-      position: absolute; inset: 0; overflow: hidden;
-      background-size: cover; background-position: center;
-      opacity: 0; transition: opacity 1.4s ease;
-    }
-    .hero__slide.is-active { opacity: 1; }
-    .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.04); }
-    .hero__slide.is-active .hero__img { animation: kenburns 7s ease-out forwards; }
-    .hero__slide--savanna { background-color: var(--savanna); background-image: linear-gradient(135deg, var(--savanna), var(--terracotta)); }
-    .hero__slide--ocean { background-color: var(--ocean); background-image: linear-gradient(135deg, var(--ocean), var(--ocean-d)); }
-    .hero__veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,17,14,0.25), rgba(20,17,14,0.6)); }
-    @keyframes kenburns { from { transform: scale(1.04); } to { transform: scale(1.12); } }
-
-    .hero__inner { position: relative; }
-    .hero__mark { font-family: var(--font-body); font-weight: 900; font-size: clamp(3.2rem, 16vw, 11rem); line-height: 0.95; letter-spacing: 0.02em; margin: 0; text-shadow: 0 4px 40px rgba(0,0,0,0.35); }
-    .hero__sub { font-size: clamp(0.95rem, 2.4vw, 1.25rem); font-weight: 600; letter-spacing: 0.35em; opacity: 0.92; margin: 1rem 0 0; }
-    .hero__scroll { position: absolute; bottom: 2rem; left: 50%; color: var(--on-dark); font-size: 1.6rem; opacity: 0.85; animation: bob 1.8s ease-in-out infinite; }
-    .hero__scroll:hover { text-decoration: none; }
-    @keyframes bob { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 8px); } }
-
-    /* 스토리 풀블리드 레일 */
+    /* 스토리 레일 */
     .stories { padding-block: clamp(2.5rem, 6vw, 4.5rem); background: var(--sand-50); }
+    .stories .tag { margin-bottom: 0.8rem; }
     .bleed-rail { padding-inline: max(1.25rem, calc((100vw - var(--maxw)) / 2)); }
 
-    /* 한눈에 */
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--gap); }
-    .stat-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; box-shadow: var(--shadow); }
-    .stat-card__value { font-family: var(--font-body); font-size: 1.7rem; font-weight: 900; color: var(--bush); }
-    .stat-card__label { font-weight: 700; margin-top: 0.3rem; }
-    .stat-card__sub { color: var(--muted); font-size: 0.88rem; margin-top: 0.3rem; }
+    /* 왜 탄자니아 */
+    .why { padding-block: clamp(4rem, 10vw, 8rem); background: var(--ink); color: var(--on-dark); text-align: center; }
+    .why__line { font-size: clamp(1.8rem, 5vw, 3.2rem); line-height: 1.25; margin: 0; white-space: pre-line; font-weight: 800; }
+    .why__sub { color: #c9bdac; margin: 1.2rem auto 0; max-width: 44ch; }
 
-    /* 타임라인 */
-    .timeline { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--sand-300); }
-    .tl { position: relative; padding: 0 0 1.6rem 1.6rem; }
-    .tl::before { content: ''; position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--savanna); border: 2px solid var(--sand-50); }
-    .tl--zanzibar::before { background: var(--ocean); }
-    .tl--move::before { background: var(--muted); }
-    .tl__day { font-family: var(--font-body); font-weight: 800; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em; }
-    .tl__title { font-size: 1.2rem; margin: 0.1rem 0 0.3rem; }
-    .tl__hotel { font-weight: 600; color: var(--ocean-d); margin: 0 0 0.3rem; font-size: 0.9rem; }
-    .tl__desc { color: var(--muted); margin: 0; }
+    /* 뭘 하나 */
+    .do-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--gap); }
+    .do-card { border-radius: var(--radius); overflow: hidden; min-height: 220px; display: flex; align-items: flex-end; position: relative; box-shadow: var(--shadow); color: #fff; }
+    .do-card--savanna { background: linear-gradient(160deg, var(--savanna), var(--terracotta)); }
+    .do-card--ocean { background: linear-gradient(160deg, var(--ocean), var(--ocean-d)); }
+    .do-card__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .do-card__body { position: relative; padding: 1.3rem; background: linear-gradient(180deg, transparent, rgba(0,0,0,0.35)); width: 100%; }
+    .do-card__emoji { font-size: 1.8rem; }
+    .do-card__body h3 { margin: 0.3rem 0 0.3rem; font-size: 1.3rem; }
+    .do-card__body p { margin: 0; font-size: 0.95rem; opacity: 0.95; word-break: keep-all; }
 
-    .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--savanna); color: #fff; }
-    .badge--zanzibar { background: var(--ocean); }
-    .badge--move { background: var(--muted); }
-
-    .sub-head { font-size: 1.15rem; margin: 2rem 0 1rem; }
-    .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--gap); }
-    .option-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.4rem; }
-    .option-card__days { color: var(--savanna-d); font-weight: 700; font-size: 0.9rem; }
-    .option-card h4 { margin: 0.2rem 0 0.5rem; }
-    .option-card p { color: var(--muted); font-size: 0.95rem; margin: 0 0 0.4rem; }
-    .option-card__best { color: var(--bush) !important; font-weight: 600; }
-
-    /* 견적 */
-    .cost-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-    .cost-table th, .cost-table td { padding: 0.9rem 1rem; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
-    .cost-table thead th { background: var(--bush); color: var(--on-dark); font-size: 0.9rem; }
-    .cost-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .cost-cat { font-weight: 700; color: var(--bush); white-space: nowrap; }
-    .cost-note { display: block; color: var(--muted); font-size: 0.82rem; margin-top: 0.2rem; }
-    .cost-table tfoot td { font-weight: 700; background: var(--sand-100); border-bottom: none; }
-    .cost-table tfoot .per-person td { color: var(--muted); font-weight: 600; }
-
-    /* 꿀팁 */
-    .tip-group { margin-top: 0.5rem; }
-    .tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--gap); }
-    .tip-card { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--savanna); border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow); }
-    .tip-card h4 { font-size: 1.1rem; margin: 0 0 0.5rem; }
-    .tip-card__summary { color: var(--ink); margin: 0 0 0.8rem; font-size: 0.95rem; }
-    .tip-card__meta { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.3rem; }
-    .tip-card__meta li { font-size: 0.88rem; color: var(--bush); font-weight: 600; background: var(--sand-100); padding: 0.3rem 0.6rem; border-radius: 8px; }
-
-    /* 준비 */
-    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--gap); }
-    .info-block { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; }
-    .info-block h3 { margin-top: 0; }
-    .info-block ul { padding-left: 1.1rem; margin: 0; }
-    .info-block li { margin-bottom: 0.6rem; }
+    /* 일정 흐름 */
+    .phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--gap); }
+    .phase { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; border-top: 5px solid var(--savanna); }
+    .phase--ocean { border-top-color: var(--ocean); }
+    .phase__tag { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.14em; color: var(--muted); }
+    .phase__title { margin: 0.3rem 0 0.6rem; font-size: 1.4rem; }
+    .phase__title span { font-size: 0.95rem; color: var(--muted); font-weight: 600; }
+    .phase__desc { margin: 0; color: var(--muted); }
+    .plan__note { margin-top: 1.5rem; color: var(--muted); font-size: 0.9rem; }
 
     /* CTA */
     .cta-final { text-align: center; }
-    .cta-title { font-size: clamp(1.6rem, 4vw, 2.3rem); }
-    .cta-lead { color: #d8cdbb; max-width: 46ch; margin: 0.5rem auto 0; }
-    .coming-soon { display: inline-block; margin-top: 1.5rem; padding: 0.6rem 1.4rem; border: 1px dashed var(--savanna); border-radius: 999px; color: var(--savanna); font-weight: 700; }
+    .cta-title { font-size: clamp(1.7rem, 4vw, 2.4rem); }
+    .cta-lead { color: #d8cdbb; max-width: 46ch; margin: 0.5rem auto 1.5rem; }
+    .cta-btn { display: inline-block; padding: 0.8rem 1.6rem; background: var(--sand-50); color: var(--ink); border-radius: 999px; font-weight: 800; }
+    .cta-btn:hover { text-decoration: none; transform: translateY(-2px); }
   </style>
-
-  <script>
-    // 히어로 메인 사진 자동 전환
-    const slides = Array.from(document.querySelectorAll('#hero-slides .hero__slide'));
-    if (slides.length > 1) {
-      let idx = 0;
-      setInterval(() => {
-        slides[idx].classList.remove('is-active');
-        idx = (idx + 1) % slides.length;
-        slides[idx].classList.add('is-active');
-      }, 4200);
-    }
-  </script>
 </BaseLayout>
