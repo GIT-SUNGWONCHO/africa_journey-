@@ -1,0 +1,59 @@
+@import './tokens.css';
+
+/* 웹폰트 — Pretendard(본문) + Noto Serif KR(매거진 헤드라인) */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--sand-50);
+  line-height: 1.7;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  word-break: keep-all; /* 한국어 줄바꿈 자연스럽게 */
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5em;
+  font-weight: 700;
+}
+
+p { margin: 0 0 1em; }
+
+a { color: var(--ocean-d); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+img { max-width: 100%; display: block; }
+
+/* --- 레이아웃 유틸 --- */
+.container { width: min(100% - 2.5rem, var(--maxw)); margin-inline: auto; }
+.container--narrow { width: min(100% - 2.5rem, var(--maxw-narrow)); margin-inline: auto; }
+
+.section { padding-block: var(--section-pad); }
+.section--sand { background: var(--sand-100); }
+.section--bush { background: var(--bush); color: var(--on-dark); }
+.section--bush h2, .section--bush h3 { color: var(--on-dark); }
+
+/* 섹션 머리표시(키커 + 제목) */
+.kicker {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--savanna-d);
+  margin: 0 0 0.6rem;
+}
+.section-title { font-size: clamp(1.7rem, 4vw, 2.6rem); margin: 0 0 1rem; }
+.section-lead { color: var(--muted); max-width: 60ch; }
+
+.eyebrow-line { width: 48px; height: 3px; background: var(--savanna); border-radius: 2px; margin: 0 0 1.2rem; }

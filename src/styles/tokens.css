@@ -1,0 +1,45 @@
+/* =========================================================
+   디자인 토큰 — 색/폰트/간격을 여기서 한 번에 관리.
+   세렝게티(사바나 골드·카키) + 잔지바르(오션 틸) 팔레트.
+   색을 바꾸고 싶으면 이 파일만 수정하면 사이트 전체에 반영됨.
+   ========================================================= */
+:root {
+  /* --- 모래/배경 계열 --- */
+  --sand-50:  #FBF8F2;
+  --sand-100: #F5EFE6;
+  --sand-200: #EBE1D2;
+  --sand-300: #DDD0BC;
+
+  /* --- 세렝게티(사바나) --- */
+  --savanna:   #C8923D; /* 아카시아 골드 (포인트) */
+  --savanna-d: #A6762C;
+  --terracotta:#C75D3C; /* 석양 */
+  --bush:      #3A4A3F; /* 깊은 부시 그린 */
+
+  /* --- 잔지바르(바다) --- */
+  --ocean:   #1F7A8C;   /* 틸 */
+  --ocean-d: #145E6D;
+
+  /* --- 텍스트 --- */
+  --ink:     #2A2620;
+  --muted:   #6B6258;
+  --on-dark: #FBF8F2;
+
+  /* --- 기능 색 --- */
+  --line:    #E3D8C7;
+  --card:    #FFFFFF;
+
+  /* --- 타이포 --- */
+  --font-display: 'Noto Serif KR', 'Nanum Myeongjo', serif;
+  --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+
+  /* --- 레이아웃 --- */
+  --maxw: 1080px;
+  --maxw-narrow: 760px;
+  --gap: clamp(1rem, 2.5vw, 2rem);
+  --radius: 14px;
+  --shadow: 0 10px 30px -12px rgba(42, 38, 32, 0.25);
+
+  /* --- 섹션 리듬 --- */
+  --section-pad: clamp(3.5rem, 8vw, 7rem);
+}
