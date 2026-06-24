@@ -1,43 +1,45 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import HeroMosaic from '../components/HeroMosaic.astro';
+import HeroVideo from '../components/HeroVideo.astro';
 import StoryGallery from '../components/StoryGallery.astro';
 import PlacesMap from '../components/PlacesMap.astro';
-import { featured, heroHook } from '../data/hero';
+import { Image } from 'astro:assets';
+import { heroHook } from '../data/hero';
 import { reels } from '../data/stories';
 import { places } from '../data/places';
-import { why, chips, concerns } from '../data/magazine';
+import { intro, qna } from '../data/magazine';
+
+// src/assets/about/ 에 사진 넣으면 '탄자니아 알아가기'의 붙박이 이미지로 사용 (없으면 그라데이션)
+const aboutMods = import.meta.glob<{ default: ImageMetadata }>('../assets/about/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}', { eager: true });
+const aboutKeys = Object.keys(aboutMods).sort();
+const aboutImage = aboutKeys.length ? aboutMods[aboutKeys[0]].default : null;
 ---
 <BaseLayout>
   <span id="top"></span>
 
-  <!-- ① 히어로 -->
-  <HeroMosaic tiles={featured} title={heroHook.title} line={heroHook.line} />
+  <!-- ① 히어로 (풀스크린 영상) -->
+  <HeroVideo title={heroHook.title} line={heroHook.line} />
 
-  <!-- ② 탄자니아 소개 -->
-  <section id="why" class="why">
-    <div class="container--narrow">
-      <p class="tag" style="color:var(--savanna)">{why.kicker}</p>
-      <h2 class="why__line">{why.line}</h2>
-      <p class="why__sub">{why.sub}</p>
-      <div class="chips">
-        {chips.map((c) => (
-          <div class="chip"><span class="chip__k">{c.k}</span><span class="chip__v">{c.v}</span></div>
-        ))}
-      </div>
+  <!-- ② 탄자니아 알아가기 (풀스크린 붙박이 사진 위로 글자 스크롤) -->
+  <section id="why" class="about">
+    <div class="about__pin">
+      {aboutImage
+        ? <Image class="about__bg" src={aboutImage} alt="탄자니아 대자연" widths={[768, 1280, 1920]} sizes="100vw" />
+        : <div class="about__bg about__bg--ph"></div>}
+      <div class="about__veil"></div>
     </div>
-  </section>
-
-  <!-- ③ 걱정 해소 -->
-  <section id="worry" class="section section--sand">
-    <div class="container--narrow">
-      <p class="tag">NO WORRIES</p>
-      <h2 class="worry__title">아프리카라 걱정돼요?</h2>
-      <div class="worry-grid">
-        {concerns.map((c) => (
-          <div class="worry"><h3>{c.q}</h3><p>{c.a}</p></div>
-        ))}
+    <div class="about__flow">
+      <div class="qblock reveal">
+        <p class="tag" style="color:var(--savanna)">{intro.kicker}</p>
+        <h2 class="about__headline">{intro.headline}</h2>
+        <p class="about__sub">{intro.sub}</p>
       </div>
+      {qna.map((item) => (
+        <div class="qblock reveal">
+          <h3 class="qq">{item.q}</h3>
+          <p class="qa">{item.a}</p>
+        </div>
+      ))}
     </div>
   </section>
 
@@ -76,21 +78,23 @@ import { why, chips, concerns } from '../data/magazine';
     .stories .tag { margin-bottom: 0.8rem; }
     .bleed-rail { padding-inline: max(1.25rem, calc((100vw - var(--maxw)) / 2)); }
 
-    /* 왜 탄자니아 */
-    .why { padding-block: clamp(4rem, 10vw, 8rem); background: var(--ink); color: var(--on-dark); text-align: center; }
-    .why__line { font-size: clamp(1.8rem, 5vw, 3.2rem); line-height: 1.25; margin: 0; white-space: pre-line; font-weight: 800; }
-    .why__sub { color: #c9bdac; margin: 1.2rem auto 0; max-width: 44ch; }
-    .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-top: 2rem; }
-    .chip { display: flex; flex-direction: column; align-items: center; gap: 2px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; padding: 0.7rem 1.1rem; }
-    .chip__k { font-size: 0.72rem; letter-spacing: 0.08em; color: var(--savanna); font-weight: 700; }
-    .chip__v { font-size: 1rem; font-weight: 800; color: #fff; }
+    /* 탄자니아 알아가기 (풀스크린 붙박이 사진 + 글자 오버레이) */
+    .about { position: relative; background: #000; }
+    .about__pin { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+    .about__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .about__bg--ph { background: linear-gradient(150deg, var(--savanna), var(--terracotta) 55%, var(--ocean)); }
+    .about__veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.6)); }
+    .about__flow { position: relative; z-index: 2; margin-top: -100svh; color: #fff; }
+    .qblock { min-height: 92svh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 1.25rem; max-width: 760px; margin-inline: auto; }
+    .about__headline { font-size: clamp(2.2rem, 7vw, 4.4rem); line-height: 1.15; margin: 0.4rem 0 0; white-space: pre-line; font-weight: 900; letter-spacing: -0.02em; text-shadow: 0 2px 24px rgba(0,0,0,0.45); }
+    .about__sub { margin: 1.4rem auto 0; max-width: 36ch; font-size: clamp(1rem, 2.2vw, 1.2rem); line-height: 1.7; opacity: 0.95; text-shadow: 0 1px 12px rgba(0,0,0,0.5); }
+    .qq { font-size: clamp(1.7rem, 5vw, 2.7rem); margin: 0 0 0.9rem; font-weight: 900; letter-spacing: -0.01em; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
+    .qa { font-size: clamp(1.05rem, 2.4vw, 1.3rem); line-height: 1.75; margin: 0; max-width: 32ch; opacity: 0.96; text-shadow: 0 1px 14px rgba(0,0,0,0.55); }
 
-    /* 걱정 해소 */
-    .worry__title { font-size: clamp(1.5rem, 4vw, 2.2rem); margin: 0 0 1.5rem; }
-    .worry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--gap); }
-    .worry { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--ocean); border-radius: var(--radius); padding: 1.3rem; }
-    .worry h3 { margin: 0 0 0.4rem; font-size: 1.05rem; }
-    .worry p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+    /* 스크롤 리빌 */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
 
     /* 뭘 하나 */
     .do-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--gap); }
@@ -122,4 +126,17 @@ import { why, chips, concerns } from '../data/magazine';
     .cta-btn:hover { text-decoration: none; transform: translateY(-2px); }
     .cta-soon { margin-top: 1rem; font-size: 0.82rem; color: #b8ad9d; }
   </style>
+
+  <script>
+    // 스크롤 시 .reveal 요소가 화면에 들어오면 하나씩 나타남
+    const els = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window && els.length) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { threshold: 0.18 });
+      els.forEach((el) => io.observe(el));
+    } else {
+      els.forEach((el) => el.classList.add('in'));
+    }
+  </script>
 </BaseLayout>

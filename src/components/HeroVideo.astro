@@ -1,0 +1,37 @@
+---
+// 풀스크린 시네마틱 영상 히어로 (애플식). 영상은 src/assets/hero-media/ 에 mp4 넣으면 자동 사용.
+// 없으면 그라데이션 폴백.
+interface Props { title: string; line: string; }
+const { title, line } = Astro.props;
+
+const vidMods = import.meta.glob('../assets/hero-media/*.{mp4,webm,MP4,WEBM}', { eager: true, query: '?url', import: 'default' });
+const keys = Object.keys(vidMods).sort();
+const videoSrc = keys.length ? (vidMods[keys[0]] as string) : null;
+---
+<section class="hv">
+  {videoSrc && (
+    <video class="hv__v" src={videoSrc} autoplay muted loop playsinline preload="auto"></video>
+  )}
+  <div class="hv__veil"></div>
+  <div class="hv__inner">
+    <h1 class="hv__title">{title}</h1>
+    <p class="hv__line">{line}</p>
+  </div>
+  <a class="hv__scroll" href="#why" aria-label="아래로">↓</a>
+</section>
+
+<style>
+  .hv {
+    position: relative; min-height: 100svh; display: grid; place-items: center; text-align: center;
+    color: #fff; overflow: hidden;
+    background: linear-gradient(135deg, var(--savanna) 0%, var(--terracotta) 55%, var(--ocean) 100%);
+  }
+  .hv__v { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hv__veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,17,14,0.28) 0%, rgba(20,17,14,0.62) 100%); }
+  .hv__inner { position: relative; padding: 1rem; }
+  .hv__title { font-family: var(--font-body); font-weight: 900; font-size: clamp(3rem, 14vw, 9rem); letter-spacing: 0.02em; line-height: 0.95; margin: 0; text-shadow: 0 4px 40px rgba(0,0,0,0.4); }
+  .hv__line { font-size: clamp(1rem, 2.6vw, 1.5rem); font-weight: 600; letter-spacing: 0.04em; opacity: 0.95; margin: 0.6rem 0 0; }
+  .hv__scroll { position: absolute; bottom: 1.6rem; left: 50%; color: #fff; font-size: 1.5rem; opacity: 0.85; animation: bob 1.8s ease-in-out infinite; }
+  .hv__scroll:hover { text-decoration: none; }
+  @keyframes bob { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 8px); } }
+</style>
