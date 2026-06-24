@@ -2,75 +2,68 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HeroMosaic from '../components/HeroMosaic.astro';
 import StoryGallery from '../components/StoryGallery.astro';
+import PlacesMap from '../components/PlacesMap.astro';
 import { featured, heroHook } from '../data/hero';
 import { reels } from '../data/stories';
-import { why, doCards, phases } from '../data/magazine';
+import { places } from '../data/places';
+import { why, chips, concerns } from '../data/magazine';
 ---
 <BaseLayout>
   <span id="top"></span>
 
-  <!-- ① 히어로: 킬러 미디어 월 -->
+  <!-- ① 히어로 -->
   <HeroMosaic tiles={featured} title={heroHook.title} line={heroHook.line} />
 
-  <!-- ② 스토리: 부가 (탭해서 보기) -->
-  <section id="stories" class="stories">
-    <p class="tag container">STORIES · 하나씩 눌러봐</p>
-    <div class="bleed-rail">
-      <StoryGallery reels={reels} />
-    </div>
-  </section>
-
-  <!-- ③ 왜 탄자니아 -->
+  <!-- ② 탄자니아 소개 -->
   <section id="why" class="why">
     <div class="container--narrow">
       <p class="tag" style="color:var(--savanna)">{why.kicker}</p>
       <h2 class="why__line">{why.line}</h2>
       <p class="why__sub">{why.sub}</p>
+      <div class="chips">
+        {chips.map((c) => (
+          <div class="chip"><span class="chip__k">{c.k}</span><span class="chip__v">{c.v}</span></div>
+        ))}
+      </div>
     </div>
   </section>
 
-  <!-- ④ 여기서 뭘 하나 -->
+  <!-- ③ 걱정 해소 -->
+  <section id="worry" class="section section--sand">
+    <div class="container--narrow">
+      <p class="tag">NO WORRIES</p>
+      <h2 class="worry__title">아프리카라 걱정돼요?</h2>
+      <div class="worry-grid">
+        {concerns.map((c) => (
+          <div class="worry"><h3>{c.q}</h3><p>{c.a}</p></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ 인터랙티브 지도 -->
   <section id="do" class="section">
     <div class="container">
-      <p class="tag">WHAT YOU CAN DO</p>
-      <div class="do-grid">
-        {doCards.map((c) => (
-          <article class={`do-card do-card--${c.tone}`}>
-            {c.img && <img class="do-card__img" src={c.img} alt={c.title} loading="lazy" />}
-            <div class="do-card__body">
-              <span class="do-card__emoji">{c.emoji}</span>
-              <h3>{c.title}</h3>
-              <p>{c.copy}</p>
-            </div>
-          </article>
-        ))}
-      </div>
+      <p class="tag">WHAT'S THERE</p>
+      <PlacesMap places={places} />
     </div>
   </section>
 
-  <!-- ⑤ 일정은 보통 이렇게 -->
-  <section id="plan" class="section section--sand">
-    <div class="container--narrow">
-      <p class="tag">보통 이런 흐름</p>
-      <div class="phases">
-        {phases.map((p) => (
-          <div class={`phase phase--${p.tone}`}>
-            <div class="phase__tag">{p.tag}</div>
-            <h3 class="phase__title">{p.title} <span>{p.days}</span></h3>
-            <p class="phase__desc">{p.desc}</p>
-          </div>
-        ))}
-      </div>
-      <p class="plan__note">우리는 11박 13일로 다녀왔어요. 자세한 일정·견적은 추후 추가 예정.</p>
+  <!-- ⑤ 스토리 (지도 아래, 지역별 하이라이트) -->
+  <section id="stories" class="stories">
+    <p class="tag container">STORIES</p>
+    <div class="bleed-rail">
+      <StoryGallery reels={reels} />
     </div>
   </section>
 
-  <!-- ⑥ 마무리 -->
+  <!-- ⑥ 공유 CTA → 커뮤니티 플랫폼(예정) -->
   <section class="section section--bush cta-final">
     <div class="container--narrow" style="text-align:center">
-      <h2 class="cta-title">가고 싶어졌다면</h2>
-      <p class="cta-lead">우리가 다녀온 길, 더 궁금하면 스토리부터 하나씩 눌러보세요.</p>
-      <a class="cta-btn" href="#stories">스토리 보러가기 ↑</a>
+      <h2 class="cta-title">당신의 여행도,<br />누군가의 첫 발이 됩니다</h2>
+      <p class="cta-lead">사진·영상부터 일정·예산·준비물·꿀팁까지 — 여행을 통째로 나누는 공간을 만들고 있어요.</p>
+      <a class="cta-btn" href="#">이야기 공유하러 가기 →</a>
+      <p class="cta-soon">커뮤니티 플랫폼 준비 중 · Coming soon</p>
     </div>
   </section>
 
@@ -87,6 +80,17 @@ import { why, doCards, phases } from '../data/magazine';
     .why { padding-block: clamp(4rem, 10vw, 8rem); background: var(--ink); color: var(--on-dark); text-align: center; }
     .why__line { font-size: clamp(1.8rem, 5vw, 3.2rem); line-height: 1.25; margin: 0; white-space: pre-line; font-weight: 800; }
     .why__sub { color: #c9bdac; margin: 1.2rem auto 0; max-width: 44ch; }
+    .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-top: 2rem; }
+    .chip { display: flex; flex-direction: column; align-items: center; gap: 2px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; padding: 0.7rem 1.1rem; }
+    .chip__k { font-size: 0.72rem; letter-spacing: 0.08em; color: var(--savanna); font-weight: 700; }
+    .chip__v { font-size: 1rem; font-weight: 800; color: #fff; }
+
+    /* 걱정 해소 */
+    .worry__title { font-size: clamp(1.5rem, 4vw, 2.2rem); margin: 0 0 1.5rem; }
+    .worry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--gap); }
+    .worry { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--ocean); border-radius: var(--radius); padding: 1.3rem; }
+    .worry h3 { margin: 0 0 0.4rem; font-size: 1.05rem; }
+    .worry p { margin: 0; color: var(--muted); font-size: 0.95rem; }
 
     /* 뭘 하나 */
     .do-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--gap); }
@@ -113,7 +117,9 @@ import { why, doCards, phases } from '../data/magazine';
     .cta-final { text-align: center; }
     .cta-title { font-size: clamp(1.7rem, 4vw, 2.4rem); }
     .cta-lead { color: #d8cdbb; max-width: 46ch; margin: 0.5rem auto 1.5rem; }
-    .cta-btn { display: inline-block; padding: 0.8rem 1.6rem; background: var(--sand-50); color: var(--ink); border-radius: 999px; font-weight: 800; }
+    .cta-title { line-height: 1.25; }
+    .cta-btn { display: inline-block; padding: 0.85rem 1.8rem; background: var(--savanna); color: #fff; border-radius: 999px; font-weight: 800; transition: transform 0.15s; }
     .cta-btn:hover { text-decoration: none; transform: translateY(-2px); }
+    .cta-soon { margin-top: 1rem; font-size: 0.82rem; color: #b8ad9d; }
   </style>
 </BaseLayout>
