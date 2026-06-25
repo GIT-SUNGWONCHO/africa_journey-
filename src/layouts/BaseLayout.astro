@@ -1,15 +1,15 @@
 ---
 import '../styles/global.css';
-import Nav from '../components/Nav.astro';
 
 interface Props {
   title?: string;
   description?: string;
 }
 const {
-  title = '탄자니아 여행 후기',
-  description = '직접 다녀온 신혼여행 경험으로 정리한 탄자니아(세렝게티+잔지바르) 일정·견적·실전 꿀팁 가이드.',
+  title = '탄자니아 여행기',
+  description = '세렝게티 + 잔지바르, 우리가 다녀온 신혼여행.',
 } = Astro.props;
+const ogImage = new URL('/og.jpg', Astro.site).href;
 ---
 <!doctype html>
 <html lang="ko">
@@ -20,29 +20,15 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
     <title>{title}</title>
   </head>
   <body>
-    <Nav />
     <main>
       <slot />
     </main>
-    <footer class="site-footer">
-      <div class="container">
-        <p>탄자니아 여행 후기 · 세렝게티 &amp; 잔지바르</p>
-        <p class="muted">실제 다녀온 경험을 바탕으로 정리했습니다. 가격·정보는 방문 시점 기준이며 변동될 수 있어요.</p>
-      </div>
-    </footer>
-
-    <style>
-      .site-footer {
-        background: var(--ink);
-        color: var(--on-dark);
-        padding-block: 3rem;
-        text-align: center;
-      }
-      .site-footer .muted { color: #b8ad9d; font-size: 0.9rem; }
-      .site-footer p { margin: 0.2rem 0; }
-    </style>
   </body>
 </html>

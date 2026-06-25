@@ -17,6 +17,7 @@ body {
   font-size: 17px;
   letter-spacing: -0.01em;
   word-break: keep-all; /* 한국어 줄바꿈 자연스럽게 */
+  overflow-anchor: none; /* sticky 섹션에서 스크롤 위치가 튀는 현상 방지 */
 }
 
 h1, h2, h3, h4 {
