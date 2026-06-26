@@ -20,11 +20,13 @@ const ST = Number(process.argv[4] ?? 0.2);  // 각 클립 앞 trim
 const ROT = (process.argv[5] ?? '').split(',').map((s) => s.trim()).filter(Boolean); // 반시계 90도 회전할 파일명
 
 if (!existsSync(SRC)) { console.error(`❌ ${SRC} 없음`); process.exit(1); }
-const files = readdirSync(SRC).filter((f) => /\.(mp4|webm|mov)$/i.test(f)).sort();
+const files = readdirSync(SRC)
+  .filter((f) => /\.(mp4|webm|mov)$/i.test(f))
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true })); // 1,2,…,10 숫자순
 if (!files.length) { console.error(`❌ ${SRC} 에 영상 없음`); process.exit(1); }
 mkdirSync(OUT_DIR, { recursive: true });
 
-const W = 1920, H = 1080, FPS = 30;
+const W = 1280, H = 720, FPS = 30;
 const inputs = files.flatMap((f) => ['-i', `${SRC}/${f}`]);
 
 // 각 클립: 앞 trim → 블러배경 채우기 → 1920x1080/30fps 정규화
@@ -56,7 +58,7 @@ const args = [
   '-y', ...inputs,
   '-filter_complex', fc,
   '-map', '[vout]', '-an',
-  '-c:v', 'libx264', '-crf', '23', '-preset', 'veryfast',
+  '-c:v', 'libx264', '-crf', '27', '-preset', 'veryfast',
   '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-r', String(FPS),
   OUT,
 ];

@@ -20,3 +20,6 @@ Thumbs.db
 
 # temp scratch
 .tmp/
+
+# materials staging (선별 전 원본 — 선택해서 src/assets로 옮김)
+/materials/

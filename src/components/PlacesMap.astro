@@ -9,6 +9,14 @@ const mapMods = import.meta.glob<{ default: ImageMetadata }>('../assets/map/*.{p
 const mapKeys = Object.keys(mapMods).sort();
 const mapImage = mapKeys.length ? mapMods[mapKeys[0]].default : null;
 
+// src/assets/places/ 에 장소 사진(파일명 = 장소 id, 예: serengeti.jpg)을 넣으면 상세카드에 자동 사용.
+const photoMods = import.meta.glob<{ default: ImageMetadata }>('../assets/places/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}', { eager: true });
+const placePhotos: Record<string, ImageMetadata> = {};
+for (const k of Object.keys(photoMods)) {
+  const name = k.split('/').pop()!.replace(/\.[^.]+$/, '').toLowerCase();
+  placePhotos[name] = photoMods[k].default;
+}
+
 // 실제 탄자니아 국경 (mapsicon, public domain). 좌표 10x·Y반전 → <g transform> 보정.
 // viewBox 를 북부+잔지바르 영역으로 크롭해서 관광지를 크게 보여줌.
 const landPaths = [
@@ -56,7 +64,11 @@ const landPaths = [
     {places.map((p, i) => (
       <article class={`pm__card pm__card--${p.tone} ${i === 0 ? 'is-active' : ''}`} data-place={p.id}>
         <div class="pm__media">
-          {p.img ? <img src={p.img} alt={p.name} /> : <div class="pm__ph">{p.icon}</div>}
+          {placePhotos[p.id]
+            ? <Image src={placePhotos[p.id]} alt={p.name} widths={[400, 720]} sizes="(max-width:760px) 100vw, 420px" />
+            : p.img
+              ? <img src={p.img} alt={p.name} />
+              : <div class="pm__ph">{p.icon}</div>}
         </div>
         <div class="pm__info">
           <p class="pm__tag">{p.tag}</p>
@@ -116,6 +128,9 @@ const landPaths = [
   .pm__media { border-radius: var(--radius); overflow: hidden; aspect-ratio: 4 / 3; }
   .pm__media img { width: 100%; height: 100%; object-fit: cover; }
   .pm__ph { width: 100%; height: 100%; display: grid; place-items: center; font-size: 3.5rem; }
+  /* 파제: 정방형(1:1), 위쪽(하늘) 잘라 집·배가 보이게 아래쪽 기준 */
+  .pm__card[data-place="paje"] .pm__media { aspect-ratio: 1 / 1; }
+  .pm__card[data-place="paje"] .pm__media img { object-position: center 78%; }
   .pm__card--savanna .pm__ph { background: linear-gradient(150deg, var(--savanna), var(--terracotta)); }
   .pm__card--ocean .pm__ph { background: linear-gradient(150deg, var(--ocean), var(--ocean-d)); }
   .pm__tag { font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--savanna-d); margin: 0; }
